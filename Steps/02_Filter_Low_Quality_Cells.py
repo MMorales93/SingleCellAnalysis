@@ -45,7 +45,7 @@ def main(args):
 	)
 	logging.info(f"Outliers by library/gene/top20: {adata.obs['outlier'].sum()}")
 
-	adata.obs["MT_outlier"] = is_outlier(adata, "pct_counts_MT", 3) | (adata.obs["pct_counts_MT"] > 8)
+	adata.obs["MT_outlier"] = is_outlier(adata, "pct_counts_MT", 10) | (adata.obs["pct_counts_MT"] > 35)
 	logging.info(f"MT outliers: {adata.obs['MT_outlier'].sum()}")
 	
 	keep = (~adata.obs["outlier"]) & (~adata.obs["MT_outlier"])
