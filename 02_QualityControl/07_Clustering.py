@@ -5,6 +5,7 @@ import logging
 import argparse
 from pathlib import Path
 import matplotlib.pyplot as plt
+import harmonypy as hm
 
 def main(args):
 	outdir = Path(args.output_dir)
@@ -26,6 +27,20 @@ def main(args):
 		
 	adata = sc.read_h5ad(str(input_path))
 	logging.info(f"Read in data from Step 6: {input_path}")
+	
+	# calculate pca
+	sc.pp.pca(adata)
+
+	# Batch correction -- add loop for when the argument is false 
+	# Get PCs from the AnnData object
+	pcs = adata.obsm['X_pca']
+	print(pcs.shape)  # (n_cells, n_pcs)
+
+	# Run Harmony on the PCA embedding
+	harmony_out = hm.run_harmony(pcs, adata.obs, "batch")
+
+	# Store corrected PCs back in the AnnData object
+	adata.obsm['X_pca_harmony'] = harmony_out.Z_corr
 	
 	# Clustering
 	sc.pp.neighbors(adata, n_pcs=30)
